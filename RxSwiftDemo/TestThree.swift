@@ -14,6 +14,7 @@
  */
 import Foundation
 import RxSwift
+import RxRelay
 
 struct TestThree {
     
@@ -106,5 +107,30 @@ struct TestThree {
         behaviorSubject.onNext("再来一条订阅后的")
 
         behaviorSubject.onCompleted()
+    }
+    
+    // 如果想将新值合并到原值上，可以通过 accept() 方法与 value 属性配合来实现。（这个常用在表格上拉加载功能上，BehaviorRelay 用来保存所有加载到的数据）
+    func demo5() {
+        //创建一个初始值为包含一个元素的数组的BehaviorRelay
+        let subject = BehaviorRelay<[String]>(value: ["1"])
+         
+        //修改value值
+        subject.accept(subject.value + ["2", "3"])
+         
+        //第1次订阅
+        subject.asObservable().subscribe {
+            print("第1次订阅：", $0)
+        }.disposed(by: disposeBag)
+         
+        //修改value值
+        subject.accept(subject.value + ["4", "5"])
+         
+        //第2次订阅
+        subject.asObservable().subscribe {
+            print("第2次订阅：", $0)
+        }.disposed(by: disposeBag)
+         
+        //修改value值
+        subject.accept(subject.value + ["6", "7"])
     }
 }
